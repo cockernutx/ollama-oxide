@@ -2,6 +2,7 @@ use reqwest::Client;
 use futures::{Stream, TryStreamExt};
 use error::OllamaError;
 use models::*;
+use tracing::debug;
 
 pub mod error;
 pub mod models;
@@ -85,7 +86,9 @@ pub async fn generate(&self, request: GenerateRequest) -> Result<GenerateRespons
     let response = self.client.post(&url).json(&request).send().await?;
 
     if response.status().is_success() {
-        let response_body: GenerateResponse = response.json().await?;
+        let text = response.text().await?;
+        debug!("ollama response: {}", text);
+        let response_body: GenerateResponse = serde_json::from_str(&text)?;
         Ok(response_body)
     } else {
         let status = response.status();
