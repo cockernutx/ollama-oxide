@@ -81,15 +81,22 @@ pub async fn pull_model(&self, model_name: &str) -> Result<impl Stream<Item = Re
 }
 
 /// Generates a completion using a model.
-pub async fn generate(&self, request: GenerateRequest) -> Result<GenerateResponse, OllamaError> {
+pub async fn generate(
+    &self,
+    request: GenerateRequest,
+) -> Result<impl Stream<Item = Result<GenerateResponse, OllamaError>>, OllamaError> {
     let url = format!("{}/api/generate", self.base_url);
     let response = self.client.post(&url).json(&request).send().await?;
 
     if response.status().is_success() {
-        let text = response.text().await?;
-        debug!("ollama response: {}", text);
-        let response_body: GenerateResponse = serde_json::from_str(&text)?;
-        Ok(response_body)
+        let stream = response
+            .bytes_stream()
+            .map_err(OllamaError::RequestFailed)
+            .and_then(|chunk| async move {
+                // Deserialize each chunk into GenerateResponse
+                serde_json::from_slice::<GenerateResponse>(&chunk).map_err(OllamaError::from)
+            });
+        Ok(stream)
     } else {
         let status = response.status();
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
