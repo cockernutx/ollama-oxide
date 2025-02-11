@@ -1,0 +1,19 @@
+services:
+  dev:
+    build: 
+      dockerfile: Containerfile.dev
+      context: .
+    env_file:
+      - .env
+  ollama:
+    image: docker.io/ollama/ollama:latest
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  surrealdb_storage:
