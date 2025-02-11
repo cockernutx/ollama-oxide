@@ -165,7 +165,13 @@ pub enum EmbedInput {
     Multiple(Vec<String>),
 }
 
-#[derive(Serialize, Debug)]
+impl Default for EmbedInput {
+    fn default() -> Self {
+        Self::Single("".to_string())
+    }
+}
+
+#[derive(Serialize, Debug, Default)]
 pub struct EmbedRequest {
     pub model: String,
     pub input: EmbedInput,
@@ -174,7 +180,7 @@ pub struct EmbedRequest {
     pub keep_alive: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 pub struct EmbedResponse {
     pub model: String,
     pub embeddings: Vec<Vec<f32>>,
