@@ -190,7 +190,34 @@ pub async fn generate_embeddings(&self, request: EmbedRequest) -> Result<EmbedRe
         Err(OllamaError::ApiError(format!("Status: {}, Error: {}", status, error_text)))
     }
 }
+pub async fn generate_multiple_embeddings(
+    &self,
+    model: String,
+    inputs: Vec<String>,
+    truncate: Option<bool>,
+    options: Option<GenerateOptions>,
+    keep_alive: Option<String>,
+) -> Result<EmbedResponse, OllamaError> {
+    let url = format!("{}/api/embed", self.base_url);
+    let request = EmbedRequest {
+        model,
+        input: EmbedInput::Multiple(inputs),
+        truncate,
+        options,
+        keep_alive,
+    };
 
+    let response = self.client.post(&url).json(&request).send().await?;
+
+    if response.status().is_success() {
+        let response_body: EmbedResponse = response.json().await?;
+        Ok(response_body)
+    } else {
+        let status = response.status();
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        Err(OllamaError::ApiError(format!("Status: {}, Error: {}", status, error_text)))
+    }
+}
 /// Lists running models.
 pub async fn list_running_models(&self) -> Result<Vec<RunningModelInfo>, OllamaError> {
     let url = format!("{}/api/ps", self.base_url);

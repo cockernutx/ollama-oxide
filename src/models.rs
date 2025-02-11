@@ -158,16 +158,23 @@ pub struct DeleteModelRequest {
     pub name: String,
 }
 
-#[derive(Serialize, Debug, Default)]
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
+pub enum EmbedInput {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+#[derive(Serialize, Debug)]
 pub struct EmbedRequest {
     pub model: String,
-    pub input: String,
+    pub input: EmbedInput,
     pub truncate: Option<bool>,
     pub options: Option<GenerateOptions>,
     pub keep_alive: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug)]
 pub struct EmbedResponse {
     pub model: String,
     pub embeddings: Vec<Vec<f32>>,
