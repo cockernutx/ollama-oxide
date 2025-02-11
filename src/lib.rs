@@ -2,19 +2,11 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use futures::{Stream, TryStreamExt};
+use error::OllamaError;
 
-/// Custom error type for the Ollama client.
-#[derive(Debug, Error)]
-pub enum OllamaError {
-    #[error("HTTP request failed: {0}")]
-    RequestFailed(#[from] reqwest::Error),
-    #[error("API returned an error: {0}")]
-    ApiError(String),
-    #[error("Invalid response format: {0}")]
-    InvalidResponseFormat(#[from] serde_json::Error),
-    #[error("Timeout while waiting for response")]
-    Timeout,
-}
+pub mod error;
+
+
 
 /// Client for interacting with the Ollama API.
 pub struct OllamaClient {
