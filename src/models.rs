@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+
 /// Request and response structs for each endpoint.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListModelsResponse {
@@ -11,6 +12,17 @@ pub struct ModelInfo {
     pub name: String,
     pub size: u64,
     pub modified_at: String,
+    pub digest: String,
+    pub details: ModelDetails,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ModelDetails {
+    pub format: String,
+    pub family: String,
+    pub families: Option<Vec<String>>,
+    pub parameter_size: String,
+    pub quantization_level: String,
 }
 
 #[derive(Serialize, Debug)]
@@ -76,6 +88,19 @@ pub struct ChatRequest {
 pub struct ChatMessage {
     pub role: String,
     pub content: String,
+    pub images: Option<Vec<String>>,
+    pub tool_calls: Option<Vec<ToolCall>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ToolCall {
+    pub function: FunctionCall,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FunctionCall {
+    pub name: String,
+    pub arguments: serde_json::Value,
 }
 
 #[derive(Deserialize, Debug)]
@@ -94,9 +119,17 @@ pub struct ChatResponse {
 
 #[derive(Serialize, Debug)]
 pub struct CreateModelRequest {
-    pub name: String,
-    pub modelfile: String,
+    pub model: String,
+    pub from: Option<String>,
+    pub files: Option<serde_json::Value>,
+    pub adapters: Option<serde_json::Value>,
+    pub template: Option<String>,
+    pub license: Option<String>,
+    pub system: Option<String>,
+    pub parameters: Option<serde_json::Value>,
+    pub messages: Option<Vec<ChatMessage>>,
     pub stream: Option<bool>,
+    pub quantize: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -123,4 +156,43 @@ pub struct PushResponse {
 #[derive(Serialize, Debug)]
 pub struct DeleteModelRequest {
     pub name: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct EmbedRequest {
+    pub model: String,
+    pub input: String,
+    pub truncate: Option<bool>,
+    pub options: Option<GenerateOptions>,
+    pub keep_alive: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct EmbedResponse {
+    pub model: String,
+    pub embeddings: Vec<Vec<f32>>,
+    pub total_duration: u64,
+    pub load_duration: u64,
+    pub prompt_eval_count: u32,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ListRunningModelsResponse {
+    pub models: Vec<RunningModelInfo>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct RunningModelInfo {
+    pub name: String,
+    pub model: String,
+    pub size: u64,
+    pub digest: String,
+    pub details: ModelDetails,
+    pub expires_at: String,
+    pub size_vram: u64,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct VersionResponse {
+    pub version: String,
 }
