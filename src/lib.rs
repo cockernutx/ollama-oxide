@@ -150,6 +150,7 @@ impl OllamaClient {
                 .try_flatten()
                 // Parse each line as JSON
                 .and_then(|line| async move {
+                    debug!(line);
                     serde_json::from_str::<GenerateResponse>(&line)
                         .map_err(OllamaError::InvalidResponseFormat)
                 });
