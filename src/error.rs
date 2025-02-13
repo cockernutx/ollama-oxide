@@ -8,6 +8,8 @@ pub enum OllamaError {
     ApiError(String),
     #[error("Invalid response format: {0}")]
     InvalidResponseFormat(#[from] serde_json::Error),
+    #[error("Invalid response format: {0}")]
+    InvalidResponse(String),
     #[error("Timeout while waiting for response")]
     Timeout,
 }
