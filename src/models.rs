@@ -37,7 +37,7 @@ pub struct PullModelRequest {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct PullResponse {
-    pub status: String,
+    pub status: Option<String>,
     pub digest: Option<String>,
     pub total: Option<u64>,
     pub completed: Option<u64>,
@@ -134,7 +134,7 @@ pub struct CreateModelRequest {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct CreateResponse {
-    pub status: String,
+    pub status: Option<String>,
     pub digest: Option<String>,
     pub total: Option<u64>,
     pub completed: Option<u64>,
@@ -147,7 +147,7 @@ pub struct PushModelRequest {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct PushResponse {
-    pub status: String,
+    pub status: Option<String>,
     pub digest: Option<String>,
     pub total: Option<u64>,
     pub completed: Option<u64>,
